@@ -1,0 +1,57 @@
+# Data Configuration for CHB-MIT Scalp EEG Dataset
+dataset:
+  name: "CHB-MIT Scalp EEG Database"
+  raw_dir: "data/raw/chbmit"
+  interim_dir: "data/interim"
+  processed_dir: "data/processed"
+  manifest_dir: "data/manifests"
+  
+channels:
+  standard_19:
+    - "Fp1"
+    - "Fp2"
+    - "F7"
+    - "F3"
+    - "Fz"
+    - "F4"
+    - "F8"
+    - "T7"
+    - "C3"
+    - "Cz"
+    - "C4"
+    - "T8"
+    - "P7"
+    - "P3"
+    - "Pz"
+    - "P4"
+    - "P8"
+    - "O1"
+    - "O2"
+  sampling_rate: 256 # Hz
+
+filtering:
+  bandpass:
+    low_freq: 0.5 # Hz
+    high_freq: 50.0 # Hz
+    order: 4
+  notch:
+    freq: 60.0 # Hz (CHB-MIT recorded at Boston Children's Hospital, 60Hz US mains)
+    quality_factor: 30.0
+
+windowing:
+  window_seconds: 10.0 # 10-second EEG window
+  stride_seconds: 5.0  # 5-second stride (50% overlap for continuous monitoring)
+  samples_per_window: 2560 # 10s * 256Hz
+  samples_per_epoch: 256   # 1s sub-epoch for high-resolution graph attention
+
+forecasting_horizon:
+  preictal_interval_minutes: 30.0 # 30 min before seizure onset
+  prediction_safety_gap_minutes: 0.0 # safety gap before onset (0 to 15m)
+  seizure_exclusion: true # exclude ictal activity from preictal class
+  postictal_exclusion_minutes: 15.0 # post-seizure recovery period
+
+splits:
+  patient_independent: true
+  train_patients: ["chb01", "chb02", "chb03", "chb05", "chb06", "chb07", "chb08", "chb09", "chb10", "chb11", "chb13", "chb14", "chb15", "chb18", "chb19", "chb20"]
+  val_patients: ["chb04", "chb16", "chb21", "chb22"]
+  test_patients: ["chb12", "chb17", "chb23", "chb24"]

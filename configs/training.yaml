@@ -1,0 +1,24 @@
+# Training and Optimization Hyperparameters
+training:
+  seed: 42
+  batch_size: 16
+  epochs: 30
+  learning_rate: 0.0005
+  weight_decay: 0.0001
+  gradient_clip_norm: 2.0
+  patience: 8
+  
+optimizer:
+  type: "AdamW"
+  scheduler: "CosineAnnealingLR"
+  eta_min: 0.00001
+
+loss:
+  name: "BinaryFocalLoss"
+  gamma: 2.0 # focusing parameter for hard examples
+  alpha: 0.75 # weighting parameter for severe 1:100 pre-ictal class imbalance
+
+checkpoints:
+  save_dir: "models"
+  best_checkpoint: "models/best_model.pt"
+  last_checkpoint: "models/last_checkpoint.pt"

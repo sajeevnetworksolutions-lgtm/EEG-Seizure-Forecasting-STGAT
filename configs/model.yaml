@@ -1,0 +1,39 @@
+# Model Architecture Configuration: Spatio-Temporal Graph Attention Network (ST-GAT)
+model:
+  name: "STGATSeizureForecaster"
+  num_nodes: 19
+  in_features: 256 # Raw samples per electrode sub-window
+  wavelet_out_dim: 64 # 1D Multi-Scale Temporal Wavelet feature projection
+  
+  gat_layer_1:
+    in_channels: 64
+    out_channels: 128
+    heads: 4
+    concat: true
+    dropout: 0.2
+    negative_slope: 0.2
+    
+  gat_layer_2:
+    in_channels: 128
+    out_channels: 128
+    heads: 4
+    concat: true
+    dropout: 0.2
+    negative_slope: 0.2
+    
+  graph_pooling:
+    type: "mean_max" # combines global mean and max node pooling
+    pooled_dim: 256
+    
+  temporal_gru:
+    input_size: 128
+    hidden_size: 128
+    num_layers: 1
+    sequence_length: 10 # 10 consecutive temporal graph states
+    dropout: 0.2
+    
+  classifier_head:
+    hidden_dim: 64
+    out_features: 1
+    dropout: 0.3
+    activation: "elu"

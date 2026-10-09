@@ -1,0 +1,20 @@
+# Seizure Forecasting Alarm Policy and Evaluation Parameters
+alarm_policy:
+  # Dual-threshold hysteresis logic
+  activation_threshold: 0.65  # Trigger alarm when risk probability >= 0.65
+  clearance_threshold: 0.40   # Clear alarm when risk probability < 0.40
+  
+  # Temporal persistence & refractory rules
+  persistence_windows: 2      # Must remain above threshold for 2 consecutive windows (10s)
+  refractory_period_minutes: 30.0 # Alarm suppression window to prevent spamming multiple alarms for 1 event
+  
+  # Clinical lead time validation boundaries
+  min_valid_lead_time_minutes: 5.0   # Must provide at least 5 minutes warning prior to onset
+  max_valid_lead_time_minutes: 30.0  # Must occur within 30-minute pre-ictal forecasting horizon
+  nominal_lead_time_minutes: 23.4
+
+evaluation_targets:
+  target_sensitivity: 0.940      # >= 94.0%
+  target_fpr_per_hour: 0.08      # < 0.08 false alarms/hour
+  target_lead_time_minutes: 20.0 # >= 20.0 minutes
+  target_auc_roc: 0.965          # >= 0.965
