@@ -1,5 +1,5 @@
 """
-Page 5 - Model Architecture and Mathematical Formulations
+Page 5 - Model Architecture and Mathematical Formulations (Crisp Light Mode)
 """
 
 import streamlit as st
@@ -12,6 +12,13 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 st.set_page_config(page_title="Model Architecture", page_icon="🧬", layout="wide")
+
+st.markdown("""
+<style>
+    .stApp { background-color: #f8fafc; color: #0f172a; }
+    section[data-testid="stSidebar"] { background-color: #ffffff !important; border-right: 1px solid #e2e8f0; }
+</style>
+""", unsafe_allow_html=True)
 
 st.title("🧬 Model Architecture & Mathematical Formulations")
 st.caption("M.Tech AI/ML Master Dissertation Technical Specifications")

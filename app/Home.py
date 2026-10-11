@@ -1,6 +1,6 @@
 """
 Hospital Clinical Monitoring Dashboard - ST-GAT Epileptic Seizure Forecasting
-Main Home Overview Portal
+Main Home Overview Portal (Crisp Medical Light Mode)
 """
 
 import streamlit as st
@@ -37,13 +37,54 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Dark clinical theme styling
+# Enforce Crisp Hospital Light Mode UI Styling
 st.markdown("""
 <style>
-    .main { background-color: #0f172a; color: #f8fafc; }
-    .stMetric { background-color: #1e293b; padding: 12px; border-radius: 8px; border: 1px solid #334155; }
-    .hero-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid #3b82f6; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
-    .status-badge { padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.95rem; }
+    /* Global Light Theme */
+    .stApp { background-color: #f8fafc; color: #0f172a; }
+    
+    /* Sidebar light styling */
+    section[data-testid="stSidebar"] {
+        background-color: #ffffff !important;
+        border-right: 1px solid #e2e8f0;
+    }
+    
+    /* Metrics Light Styling */
+    div[data-testid="stMetric"] {
+        background-color: #ffffff !important;
+        padding: 16px !important;
+        border-radius: 10px !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    }
+    div[data-testid="stMetricLabel"] {
+        color: #475569 !important;
+        font-weight: 600 !important;
+    }
+    div[data-testid="stMetricValue"] {
+        color: #0284c7 !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Hero Card */
+    .hero-card {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-left: 6px solid #0284c7;
+        border-radius: 10px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    
+    /* Card box */
+    .card-box {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -61,7 +102,7 @@ engine, simulator = load_system()
 # Sidebar Controls
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/brain.png", width=64)
-    st.title("Clinical Control Hub")
+    st.markdown("<h2 style='color:#0f172a; margin-top:0;'>Clinical Control Hub</h2>", unsafe_allow_html=True)
     st.caption("CHB-MIT Pediatric Scalp EEG Monitoring")
     st.divider()
     
@@ -74,16 +115,16 @@ with st.sidebar:
                                  }[s])
     
     st.divider()
-    st.markdown("### Navigation")
-    st.info("Use the multi-page navigation in the sidebar to explore the 19-Channel EEG Viewer, Brain Connectivity Graph, Real-Time Forecasting, and Scientific Evaluation.")
+    st.markdown("<h4 style='color:#0f172a;'>Navigation</h4>", unsafe_allow_html=True)
+    st.info("Explore the 19-Channel EEG Viewer, Brain Connectivity Graph, Real-Time Forecasting, and Scientific Evaluation pages above.")
 
-# Top Hero Header
+# Top Hero Header (Crisp Light Theme)
 st.markdown("""
 <div class="hero-card">
-    <h1 style="color: #38bdf8; margin-bottom: 6px;">🧠 ST-GAT Epileptic Seizure Forecasting System</h1>
-    <h4 style="color: #94a3b8; font-weight: 400; margin-top: 0;">Spatio-Temporal Graph Attention Networks for Real-Time Seizure Forecasting from Multi-Channel Scalp EEG</h4>
-    <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.5; margin-bottom: 0;">
-        Advanced AI clinical decision support platform evaluating dynamic 19-electrode brain network synchrony (Phase Locking Value) to forecast epileptic seizures <b>15 to 30 minutes before clinical onset</b> on the <b>CHB-MIT Pediatric Scalp EEG Database</b>.
+    <h1 style="color: #0284c7; margin-bottom: 8px; font-weight: 800;">🧠 ST-GAT Epileptic Seizure Forecasting System</h1>
+    <h4 style="color: #334155; font-weight: 500; margin-top: 0;">Spatio-Temporal Graph Attention Networks for Real-Time Seizure Forecasting from Multi-Channel Scalp EEG</h4>
+    <p style="color: #475569; font-size: 1rem; line-height: 1.6; margin-bottom: 0;">
+        Clinical decision support platform analyzing dynamic 19-channel brain network synchrony (Phase Locking Value) to forecast epileptic seizures <b>15 to 30 minutes before clinical onset</b> on the <b>CHB-MIT Pediatric Scalp EEG Database</b>.
     </p>
 </div>
 """, unsafe_allow_html=True)
@@ -107,16 +148,24 @@ with col4:
 with col5:
     st.metric("Inference Latency", "3.8 ms / epoch", delta="Real-Time Edge Ready")
 
-# Emergency Alert Banner
-status_bg = res["status_color"]
-lead_str = f"| Warning Lead Time: {res['lead_time_min']:.1f} Minutes" if res['lead_time_min'] else ""
+# Emergency Alert Banner (Crisp Light Mode Colors)
+status_color_light = {
+    "#10b981": ("#dcfce7", "#15803d", "#16a34a"), # green
+    "#f59e0b": ("#fef3c7", "#b45309", "#d97706"), # amber
+    "#ef4444": ("#fee2e2", "#b91c1c", "#dc2626"), # red
+    "#b91c1c": ("#ffe4e6", "#9f1239", "#e11d48")  # critical red
+}.get(res["status_color"], ("#fee2e2", "#b91c1c", "#dc2626"))
+
+bg_tint, text_dark, border_c = status_color_light
+lead_str = f" | Warning Lead Time: {res['lead_time_min']:.1f} Minutes" if res['lead_time_min'] else ""
+
 st.markdown(f"""
-<div style="background-color: {status_bg}22; border: 2px solid {status_bg}; border-radius: 8px; padding: 14px 20px; margin-top: 15px; margin-bottom: 20px;">
+<div style="background-color: {bg_tint}; border: 2px solid {border_c}; border-radius: 10px; padding: 16px 22px; margin-top: 18px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
     <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 1.2rem; font-weight: 700; color: {status_bg};">
-            CLINICAL STATUS: {res['status_label']} {lead_str}
+        <span style="font-size: 1.25rem; font-weight: 800; color: {text_dark};">
+            CLINICAL STATUS: {res['status_label']}{lead_str}
         </span>
-        <span style="background-color: {status_bg}; color: white; padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+        <span style="background-color: {text_dark}; color: #ffffff; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.95rem;">
             {'⚠️ ALARM TRIGGERED' if res['alarm_active'] else 'NORMAL VIGILANCE'}
         </span>
     </div>
@@ -124,30 +173,36 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Overview Columns
-col_left, col_right = st.columns([1, 1])
+col_left, col_right = st.columns([1.1, 0.9])
 
 with col_left:
-    st.subheader("System Capabilities & Architecture")
+    st.markdown("<h3 style='color:#0f172a;'>System Architecture & Pipeline</h3>", unsafe_allow_html=True)
     st.markdown("""
-    - **19-Channel 10-20 Montage Ingestion**: Ingests continuous EEG filtered with 0.5–50 Hz bandpass and 60 Hz notch filters.
-    - **Dynamic Brain Graph Construction**: Computes pairwise **Phase Locking Value (PLV)** across electrode channels in real time.
-    - **Spatio-Temporal Graph Attention Network**: 2-Layer 4-Head Spatial GAT + Recurrent GRU + Class-Imbalanced Focal Loss ($\gamma=2.0, \alpha=0.75$).
-    - **Dual-Threshold Hysteresis Alarm Controller**: Suppresses transient noise to achieve $< 0.08$ false alarms per hour.
-    """)
-    st.image(str(PROJECT_ROOT / "Architecture_Diagram.png"), caption="ST-GAT Seizure Forecasting Architecture Pipeline", use_container_width=True)
+    <div class="card-box">
+        <ul style="color: #334155; line-height: 1.8; margin-bottom: 0;">
+            <li><b>19-Channel 10-20 Montage Ingestion</b>: Standardized EEG bandpass filtered (0.5–50 Hz) and notch filtered (60 Hz).</li>
+            <li><b>Dynamic Phase Locking Value (PLV)</b>: Instantaneous analytical Hilbert phase synchrony across all 19 electrode channels.</li>
+            <li><b>Spatio-Temporal Graph Attention Network</b>: 2-Layer 4-Head Spatial GAT + Recurrent GRU with Focal Loss (γ=2.0, α=0.75).</li>
+            <li><b>Dual-Threshold Hysteresis Alarm</b>: High threshold (0.65) / low threshold (0.40) to suppress spurious false alarms.</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    st.image(str(PROJECT_ROOT / "Architecture_Diagram.png"), caption="ST-GAT End-to-End Pipeline Architecture", use_container_width=True)
 
 with col_right:
-    st.subheader("Regional Epileptogenic Activation Profile")
+    st.markdown("<h3 style='color:#0f172a;'>Regional Epileptogenic Profile</h3>", unsafe_allow_html=True)
     regions = list(res["region_scores"].keys())
     scores = [res["region_scores"][r] * 100 for r in regions]
     df_reg = pd.DataFrame({"Brain Region": regions, "GAT Attention Activation (%)": scores})
-    st.bar_chart(df_reg.set_index("Brain Region"), color="#38bdf8", height=240)
+    st.bar_chart(df_reg.set_index("Brain Region"), color="#0284c7", height=240)
     
-    st.subheader("Patient Cohort Record")
+    st.markdown("<h3 style='color:#0f172a;'>Patient Cohort Record</h3>", unsafe_allow_html=True)
     st.markdown(f"""
-    - **Patient ID**: `{selected_patient}`
-    - **Selected State**: `{clinical_state.upper()}`
-    - **Channels Monitored**: 19 Electrodes (`Fp1`, `Fp2`, `F7`, `F3`, `Fz`, `F4`, `F8`, `T7`, `C3`, `Cz`, `C4`, `T8`, `P7`, `P3`, `Pz`, `P4`, `P8`, `O1`, `O2`)
-    - **Sampling Rate**: 256 Hz
-    - **Hospital Benchmark**: CHB-MIT Pediatric Scalp EEG Database
-    """)
+    <div class="card-box">
+        <p style="color: #334155; margin-bottom: 6px;"><b>Patient ID:</b> <code style="color:#0284c7; background:#e0f2fe; padding:2px 6px; border-radius:4px;">{selected_patient}</code></p>
+        <p style="color: #334155; margin-bottom: 6px;"><b>Clinical State:</b> <code style="color:#0284c7; background:#e0f2fe; padding:2px 6px; border-radius:4px;">{clinical_state.upper()}</code></p>
+        <p style="color: #334155; margin-bottom: 6px;"><b>Electrode Montage:</b> 19 Channels (Fp1, Fp2, F7, F3, Fz, F4, F8, T7, C3, Cz, C4, T8, P7, P3, Pz, P4, P8, O1, O2)</p>
+        <p style="color: #334155; margin-bottom: 6px;"><b>Sampling Frequency:</b> 256 Hz</p>
+        <p style="color: #334155; margin-bottom: 0;"><b>Benchmark Database:</b> CHB-MIT Pediatric Scalp EEG Database (982 Hours)</p>
+    </div>
+    """, unsafe_allow_html=True)

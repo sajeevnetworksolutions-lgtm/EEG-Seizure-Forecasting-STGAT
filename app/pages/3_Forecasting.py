@@ -1,5 +1,5 @@
 """
-Page 3 - Real-Time Seizure Risk Forecasting & Clinical Alarm Engine
+Page 3 - Real-Time Seizure Risk Forecasting & Clinical Alarm Engine (Crisp Light Mode)
 """
 
 import streamlit as st
@@ -8,6 +8,18 @@ import pandas as pd
 import plotly.graph_objects as go
 from pathlib import Path
 import sys
+import os
+
+# Windows PyTorch DLL initialization fix
+if sys.platform == "win32":
+    try:
+        import site
+        for sp in site.getsitepackages():
+            torch_lib = Path(sp) / "torch" / "lib"
+            if torch_lib.exists():
+                os.add_dll_directory(str(torch_lib))
+    except Exception:
+        pass
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -18,6 +30,13 @@ from src.forecasting_engine import RealTimeForecastingEngine
 from src.data.chb_mit_dataset import CHBMITDataSimulator
 
 st.set_page_config(page_title="Seizure Forecasting", page_icon="🚨", layout="wide")
+
+st.markdown("""
+<style>
+    .stApp { background-color: #f8fafc; color: #0f172a; }
+    section[data-testid="stSidebar"] { background-color: #ffffff !important; border-right: 1px solid #e2e8f0; }
+</style>
+""", unsafe_allow_html=True)
 
 st.title("🚨 Real-Time Seizure Risk Forecasting & Alarm Console")
 st.caption("Dual-Threshold Hysteresis Early Warning Horizon Controller (15 - 30 Minutes Pre-Ictal Window)")
@@ -67,40 +86,49 @@ entry = {
 }
 st.session_state.forecast_history.append(entry)
 
-# Top Status Indicator
-status_bg = res["status_color"]
-lead_str = f"| Lead Time: {res['lead_time_min']:.1f} Min" if res['lead_time_min'] else ""
+# Top Status Indicator (Light Theme)
+status_color_light = {
+    "#10b981": ("#dcfce7", "#15803d", "#16a34a"),
+    "#f59e0b": ("#fef3c7", "#b45309", "#d97706"),
+    "#ef4444": ("#fee2e2", "#b91c1c", "#dc2626"),
+    "#b91c1c": ("#ffe4e6", "#9f1239", "#e11d48")
+}.get(res["status_color"], ("#fee2e2", "#b91c1c", "#dc2626"))
+
+bg_tint, text_dark, border_c = status_color_light
+lead_str = f" | Warning Lead Time: {res['lead_time_min']:.1f} Min" if res['lead_time_min'] else ""
+
 st.markdown(f"""
-<div style="background-color: {status_bg}22; border: 2px solid {status_bg}; border-radius: 8px; padding: 14px 20px; margin-bottom: 20px;">
-    <span style="font-size: 1.3rem; font-weight: 700; color: {status_bg};">
-        STATUS: {res['status_label']} {lead_str}
+<div style="background-color: {bg_tint}; border: 2px solid {border_c}; border-radius: 10px; padding: 16px 22px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+    <span style="font-size: 1.3rem; font-weight: 800; color: {text_dark};">
+        STATUS: {res['status_label']}{lead_str}
     </span>
 </div>
 """, unsafe_allow_html=True)
 
-# Risk Probability Trajectory Plot
+# Risk Probability Trajectory Plot on Clean White Canvas
 df_hist = pd.DataFrame(st.session_state.forecast_history)
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(
     x=df_hist["Step"], y=df_hist["Risk"],
     mode="lines+markers",
-    line=dict(color="#38bdf8", width=2.5),
+    line=dict(color="#0284c7", width=3),
+    marker=dict(size=6, color="#0369a1"),
     name="Pre-Ictal Risk Score (%)"
 ))
 
 # Threshold lines
-fig.add_hline(y=alarm_threshold*100, line_dash="dash", line_color="#ef4444", annotation_text=f"Alarm Trigger ({alarm_threshold*100:.0f}%)")
-fig.add_hline(y=clear_threshold*100, line_dash="dot", line_color="#10b981", annotation_text=f"Clearance Reset ({clear_threshold*100:.0f}%)")
+fig.add_hline(y=alarm_threshold*100, line_dash="dash", line_color="#dc2626", annotation_text=f"Alarm Trigger ({alarm_threshold*100:.0f}%)", annotation_font_color="#dc2626")
+fig.add_hline(y=clear_threshold*100, line_dash="dot", line_color="#16a34a", annotation_text=f"Clearance Reset ({clear_threshold*100:.0f}%)", annotation_font_color="#16a34a")
 
 fig.update_layout(
-    height=360,
-    margin=dict(l=30, r=20, t=20, b=30),
-    plot_bgcolor="#0b132b",
-    paper_bgcolor="#1e293b",
-    font=dict(color="#94a3b8"),
-    xaxis=dict(title="Monitoring Time Step (Seconds)", showgrid=True, gridcolor="#1e293b"),
-    yaxis=dict(title="Pre-Ictal Risk Probability (%)", range=[0, 105], showgrid=True, gridcolor="#1e293b")
+    height=380,
+    margin=dict(l=40, r=20, t=20, b=30),
+    plot_bgcolor="#ffffff",
+    paper_bgcolor="#ffffff",
+    font=dict(color="#0f172a", family="sans-serif"),
+    xaxis=dict(title="Monitoring Time Step (Seconds)", showgrid=True, gridcolor="#f1f5f9", linecolor="#cbd5e1"),
+    yaxis=dict(title="Pre-Ictal Risk Probability (%)", range=[0, 105], showgrid=True, gridcolor="#f1f5f9", linecolor="#cbd5e1")
 )
 st.plotly_chart(fig, use_container_width=True)
 

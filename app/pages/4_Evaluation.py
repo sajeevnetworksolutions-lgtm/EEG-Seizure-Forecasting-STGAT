@@ -1,5 +1,5 @@
 """
-Page 4 - Scientific Evaluation Benchmark & Ablation Comparisons
+Page 4 - Scientific Evaluation Benchmark & Ablation Comparisons (Crisp Light Mode)
 """
 
 import streamlit as st
@@ -13,6 +13,13 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 st.set_page_config(page_title="Evaluation & Benchmarks", page_icon="📊", layout="wide")
+
+st.markdown("""
+<style>
+    .stApp { background-color: #f8fafc; color: #0f172a; }
+    section[data-testid="stSidebar"] { background-color: #ffffff !important; border-right: 1px solid #e2e8f0; }
+</style>
+""", unsafe_allow_html=True)
 
 st.title("📊 Clinical Evaluation Benchmarks & Comparative Studies")
 st.caption("CHB-MIT Pediatric Scalp EEG Database (982 Hours, 24 Patient Cohorts, 198 Seizures)")
