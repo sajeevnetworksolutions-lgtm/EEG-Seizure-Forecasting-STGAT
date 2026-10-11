@@ -8,6 +8,18 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 import sys
+import os
+
+# Windows PyTorch DLL initialization fix
+if sys.platform == "win32":
+    try:
+        import site
+        for sp in site.getsitepackages():
+            torch_lib = Path(sp) / "torch" / "lib"
+            if torch_lib.exists():
+                os.add_dll_directory(str(torch_lib))
+    except Exception:
+        pass
 
 # Ensure root in sys.path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent

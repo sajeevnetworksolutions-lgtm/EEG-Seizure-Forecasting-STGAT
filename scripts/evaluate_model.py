@@ -1,12 +1,21 @@
-"""
-Comprehensive Model Evaluation CLI Script
-"""
-
 import sys
+import os
 from pathlib import Path
 import yaml
-import torch
 import numpy as np
+
+# Windows PyTorch DLL initialization fix
+if sys.platform == "win32":
+    try:
+        import site
+        for sp in site.getsitepackages():
+            torch_lib = Path(sp) / "torch" / "lib"
+            if torch_lib.exists():
+                os.add_dll_directory(str(torch_lib))
+    except Exception:
+        pass
+
+import torch
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
