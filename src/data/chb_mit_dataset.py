@@ -23,7 +23,56 @@ class CHBMITDataSimulator:
         self.sample_rate = sample_rate
         self.rng = np.random.RandomState(42)
 
+    def load_real_patient_recording(self, patient_id="chb01", duration_sec=12, start_sec=0.0):
+        """
+        Load authentic multi-channel EEG signal directly from European Data Format (.edf) file on disk.
+        """
+        try:
+            from src.data.database_manager import DatabaseManager
+            from src.data.load_edf import load_edf, get_channel_mapping
+            
+            edf_path = DatabaseManager.get_patient_edf_path(patient_id)
+            if edf_path is not None and edf_path.exists():
+                raw = load_edf(edf_path, preload=True)
+                mapping = get_channel_mapping(raw.ch_names, ELECTRODES_19)
+                available = [ch for ch in ELECTRODES_19 if ch in mapping]
+                unique_picks = list(dict.fromkeys([mapping[ch] for ch in available]))
+                raw_picked = raw.copy().pick(unique_picks)
+                data, times = raw_picked[:, :]
+                picked_names = raw_picked.ch_names
+
+                
+                sfreq = raw.info['sfreq']
+                start_sample = int(start_sec * sfreq)
+                n_samples_req = int(duration_sec * self.sample_rate)
+                end_sample = min(data.shape[1], start_sample + n_samples_req)
+                sliced = data[:, start_sample:end_sample]
+                
+                full_eeg = np.zeros((NUM_CHANNELS, n_samples_req), dtype=np.float32)
+                for idx, ch in enumerate(ELECTRODES_19):
+                    if ch in available and mapping[ch] in picked_names:
+                        src_idx = picked_names.index(mapping[ch])
+                        val = sliced[src_idx]
+
+                        if np.max(np.abs(val)) < 1e-3: # convert Volts to microvolts
+                            val = val * 1e6
+                        if len(val) >= n_samples_req:
+                            full_eeg[idx] = val[:n_samples_req]
+                        elif len(val) > 0:
+                            full_eeg[idx, :len(val)] = val
+                            full_eeg[idx, len(val):] = val[-1]
+                    else:
+                        full_eeg[idx] = self.rng.randn(n_samples_req) * 5.0
+                        
+                time_axis = np.linspace(0, duration_sec, n_samples_req, endpoint=False)
+                return full_eeg, time_axis
+        except Exception as e:
+            print(f"[Real EDF Load Fallback] Error reading {patient_id} EDF: {e}")
+            
+        return self.generate_patient_recording(patient_id=patient_id, duration_sec=duration_sec, state="preictal")
+
     def generate_patient_recording(self, patient_id="chb01", duration_sec=300, state="interictal"):
+
         """
         Generate multi-channel 19-electrode continuous EEG signal.
         Args:

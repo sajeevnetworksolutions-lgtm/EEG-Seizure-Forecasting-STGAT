@@ -16,4 +16,13 @@ if sys.platform == "win32":
     except Exception:
         pass
 
+# Polyfill np.dtypes.StringDType for MNE with NumPy < 2.0
+try:
+    import numpy as np
+    if hasattr(np, "dtypes") and not hasattr(np.dtypes, "StringDType"):
+        np.dtypes.StringDType = np.dtype("U")
+except Exception:
+    pass
+
 __version__ = "1.0.0"
+

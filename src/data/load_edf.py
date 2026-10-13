@@ -26,6 +26,8 @@ def load_edf(path: str | Path, preload: bool = True):
         raise FileNotFoundError(f"EDF file not found: {path.resolve()}")
         
     try:
+        if hasattr(np, "dtypes") and not hasattr(np.dtypes, "StringDType"):
+            np.dtypes.StringDType = np.dtype("U")
         import mne
     except ImportError:
         raise ImportError("MNE-Python is required to load EDF files. Run: pip install mne")
