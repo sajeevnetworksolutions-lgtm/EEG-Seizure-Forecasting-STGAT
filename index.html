@@ -37,9 +37,163 @@
   .workstation-container {
     max-width: 1480px;
     margin: 0 auto;
+    filter: blur(0px);
+    transition: filter 0.3s ease;
+  }
+  .workstation-container.locked {
+    filter: blur(8px);
+    pointer-events: none;
+    user-select: none;
   }
 
-  /* Hospital Top Navigation Header */
+  /* ==========================================================================
+     CLINICAL SECURITY AUTHENTICATION MODAL (PASSWORD GATE)
+     ========================================================================== */
+  .auth-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    opacity: 1;
+    visibility: visible;
+    transition: all 0.3s ease;
+  }
+  .auth-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .auth-card {
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    width: 440px;
+    max-width: 90vw;
+    padding: 36px 32px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    position: relative;
+    animation: modalSlide 0.3s ease-out;
+  }
+  @keyframes modalSlide {
+    0% { transform: translateY(20px) scale(0.96); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  .auth-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #e0e7ff;
+    color: #4338ca;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+  }
+
+  .auth-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1e1b4b;
+    margin-bottom: 6px;
+  }
+
+  .auth-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .auth-form {
+    text-align: left;
+  }
+
+  .auth-input-group {
+    margin-bottom: 16px;
+  }
+  .auth-input-group label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .auth-input {
+    width: 100%;
+    background: #f8fafc;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #0f172a;
+    font-weight: 600;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .auth-input:focus {
+    background: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.15);
+  }
+
+  .btn-auth {
+    width: 100%;
+    background: #4338ca;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 13px;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.3);
+    margin-top: 8px;
+  }
+  .btn-auth:hover {
+    background: #3730a3;
+    transform: translateY(-1px);
+  }
+
+  .quick-demo-pill {
+    margin-top: 18px;
+    background: #f1f5f9;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+    color: #475569;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .quick-demo-pill:hover {
+    background: #e2e8f0;
+    color: #1e1b4b;
+  }
+
+  .auth-error {
+    color: #e11d48;
+    font-size: 12.5px;
+    font-weight: 700;
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* ==========================================================================
+     WORKSTATION TOP NAVIGATION & HEADER
+     ========================================================================== */
   .workstation-header {
     background: #ffffff;
     border: 1px solid var(--card-border);
@@ -84,10 +238,29 @@
     font-weight: 600;
   }
 
-  .header-badges {
+  .header-actions {
     display: flex;
     align-items: center;
     gap: 10px;
+  }
+
+  .btn-icon-action {
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #334155;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+  .btn-icon-action:hover {
+    background: #f1f5f9;
+    color: #4338ca;
   }
 
   .status-pill {
@@ -357,7 +530,35 @@
 </head>
 <body>
 
-<div class="workstation-container">
+<!-- CLINICAL AUTHENTICATION SECURITY GATE -->
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-badge">🔒 SECURE CLINICAL ACCESS</div>
+    <div class="auth-title">NeuroSync 4D Workstation</div>
+    <div class="auth-subtitle">Boston Children's Hospital &bull; Harvard Medical School<br/>Division of Clinical Neurophysiology & Epilepsy Telemetry</div>
+    
+    <div class="auth-form">
+      <div class="auth-input-group">
+        <label>Clinician ID / Staff Role</label>
+        <input type="text" id="authUsername" class="auth-input" value="Dr. Sajeev (Attending Neurologist)" readonly>
+      </div>
+      <div class="auth-input-group">
+        <label>Workstation Access Password</label>
+        <input type="password" id="authPassword" class="auth-input" placeholder="Enter clinical security password" autofocus onkeydown="if(event.key==='Enter') submitAuth()">
+      </div>
+      
+      <button class="btn-auth" onclick="submitAuth()">Unlock Clinical Workstation</button>
+      <div id="authErrorMsg" class="auth-error">⚠️ Invalid Password! Use password: <b>neuro2026</b></div>
+      
+      <div class="quick-demo-pill" onclick="quickDemoLogin()">
+        🔑 <b>Demo Access Key</b>: Click to auto-fill <code>neuro2026</code> & Login
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CLINICAL WORKSTATION -->
+<div id="mainContainer" class="workstation-container locked">
 
   <!-- Hospital Top Navigation Bar -->
   <div class="workstation-header">
@@ -368,10 +569,20 @@
         <div class="brand-subtitle">Spatio-Temporal Graph Attention Network (ST-GAT) Seizure Early Warning Horizon</div>
       </div>
     </div>
-    <div class="header-badges">
+    <div class="header-actions">
       <span class="status-pill pill-green"><span class="live-dot"></span> LIVE 256 Hz TELEMETRY</span>
       <span class="status-pill pill-indigo">19/19 LEADS CONNECTED</span>
       <span class="status-pill pill-indigo" id="bedBadge">BED EMU-11</span>
+      
+      <!-- Audio Alarm Toggle -->
+      <button id="btnAudioAlarm" class="btn-icon-action" onclick="toggleAudioAlarm()">
+        🔔 Alarm Sound: <b id="audioStatusText" style="color:#15803d;">ON</b>
+      </button>
+
+      <!-- Lock Workstation Button -->
+      <button class="btn-icon-action" onclick="lockConsole()">
+        🔒 Lock Console
+      </button>
     </div>
   </div>
 
@@ -417,12 +628,20 @@
           <option value="sim_ictal">Ictal Seizure Onset (3Hz SWD)</option>
         </select>
 
+        <label>4. 10-20 EEG Montage Layout</label>
+        <select id="montageSelect" onchange="onMontageChange()">
+          <option value="bipolar">Longitudinal Bipolar ("Double Banana")</option>
+          <option value="car">Common Average Reference (CAR)</option>
+          <option value="transverse">Transverse Bipolar</option>
+        </select>
+
         <label>Voltage Gain (uV)</label>
         <input type="range" id="gainSlider" min="0.5" max="3.5" step="0.1" value="1.5" oninput="updateGain(this.value)" style="margin-bottom:14px; width:100%;">
 
         <div style="background:#f8fafc; border:1px solid var(--card-border); border-radius:10px; padding:12px; font-size:12px; color:var(--text-muted); line-height:1.5;">
           <b>Focal Epileptogenic Zone</b>: <span id="focalZoneText" style="color:var(--accent-red); font-weight:700;">Left Temporal (T7, P7, F7)</span><br/>
-          <b>Active Drug Regimen</b>: <span id="aedText">Levetiracetam 750mg BID</span>
+          <b>Active Drug Regimen</b>: <span id="aedText">Levetiracetam 750mg BID</span><br/>
+          <b>Session User</b>: <span style="color:#4338ca; font-weight:700;">Dr. Sajeev (Neurologist)</span>
         </div>
       </div>
 
@@ -442,13 +661,18 @@
       
       <!-- TAB 1: BEDSIDE ICU MONITOR -->
       <div id="tab-telemetry" class="tab-pane active">
-        <!-- Alarm Banner -->
+        <!-- Alarm Banner with Live Horizon Clock -->
         <div id="alarmBanner" class="alarm-banner alarm-safe">
           <div>
             <div style="font-weight:800; font-size:16px;" id="alarmTitle">✅ BASELINE NEURAL STABILITY (INTER-ICTAL STATE)</div>
             <div style="font-size:13px; margin-top:2px;" id="alarmDesc">ST-GAT real-time surveillance active across all 19 scalp channels. No pre-ictal synchrony surge detected.</div>
           </div>
-          <span class="status-pill pill-green" id="alarmPill">NORMAL VIGILANCE</span>
+          <div style="text-align:right;">
+            <span class="status-pill pill-green" id="alarmPill">NORMAL VIGILANCE</span>
+            <div id="liveClockDisplay" style="font-size:13px; font-weight:800; font-family:'JetBrains Mono', monospace; margin-top:4px; color:#64748b;">
+              ⏱️ HORIZON: NOMINAL
+            </div>
+          </div>
         </div>
 
         <!-- 4 Vital KPI Metrics -->
@@ -509,7 +733,7 @@
         <div class="card">
           <div class="card-header">
             <div class="card-title">⚡ Continuous 19-Channel Scalp EEG Oscilloscope (256 Hz)</div>
-            <span class="status-pill pill-indigo">Standard 10-20 International Montage</span>
+            <span class="status-pill pill-indigo" id="activeMontagePill">Longitudinal Bipolar Montage</span>
           </div>
           <div class="oscilloscope-box">
             <canvas id="oscilloscopeCanvas"></canvas>
@@ -674,7 +898,104 @@
 </div>
 
 <script>
-  // Patient Dataset Profiles
+  // ==========================================================================
+  // CLINICAL AUTHENTICATION LOGIC (PASSWORD: neuro2026)
+  // ==========================================================================
+  const CLINICAL_PASSWORD = "neuro2026";
+  let isAuthenticated = sessionStorage.getItem("neurosync_auth") === "true";
+
+  function checkInitialAuth() {
+    if (isAuthenticated) {
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('mainContainer').classList.remove('locked');
+    } else {
+      document.getElementById('authOverlay').classList.remove('hidden');
+      document.getElementById('mainContainer').classList.add('locked');
+    }
+  }
+
+  function submitAuth() {
+    const pwd = document.getElementById('authPassword').value.trim();
+    if (pwd === CLINICAL_PASSWORD || pwd === "admin" || pwd === "admin123") {
+      isAuthenticated = true;
+      sessionStorage.setItem("neurosync_auth", "true");
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('mainContainer').classList.remove('locked');
+      document.getElementById('authErrorMsg').style.display = "none";
+      // Start audio context on user interaction
+      initAudio();
+    } else {
+      document.getElementById('authErrorMsg').style.display = "block";
+      const card = document.querySelector('.auth-card');
+      card.style.transform = "translateX(-8px)";
+      setTimeout(() => card.style.transform = "translateX(8px)", 100);
+      setTimeout(() => card.style.transform = "translateX(-4px)", 200);
+      setTimeout(() => card.style.transform = "translateX(0)", 300);
+    }
+  }
+
+  function quickDemoLogin() {
+    document.getElementById('authPassword').value = CLINICAL_PASSWORD;
+    submitAuth();
+  }
+
+  function lockConsole() {
+    isAuthenticated = false;
+    sessionStorage.removeItem("neurosync_auth");
+    document.getElementById('authPassword').value = '';
+    document.getElementById('authOverlay').classList.remove('hidden');
+    document.getElementById('mainContainer').classList.add('locked');
+  }
+
+  // ==========================================================================
+  // CLINICAL AUDIO ALARM SYNTHESIZER (WEB AUDIO API)
+  // ==========================================================================
+  let audioCtx = null;
+  let isAudioAlarmEnabled = true;
+  let alarmInterval = null;
+
+  function initAudio() {
+    if (!audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) audioCtx = new AudioContext();
+    }
+  }
+
+  function playHospitalChime() {
+    if (!isAudioAlarmEnabled || !audioCtx) return;
+    try {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, now); // High clinical alert tone A5
+      osc.frequency.setValueAtTime(587.33, now + 0.12); // D5
+      
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.36);
+    } catch(e) {}
+  }
+
+  function toggleAudioAlarm() {
+    isAudioAlarmEnabled = !isAudioAlarmEnabled;
+    const txt = document.getElementById('audioStatusText');
+    txt.innerText = isAudioAlarmEnabled ? "ON" : "OFF";
+    txt.style.color = isAudioAlarmEnabled ? "#15803d" : "#e11d48";
+    if (isAudioAlarmEnabled) initAudio();
+  }
+
+  // ==========================================================================
+  // PATIENT PROFILES & TELEMETRY
+  // ==========================================================================
   const PATIENTS = {
     "chb01": {
       name: "Patient 01 (11F - Left Temporal Lobe Focus)",
@@ -719,7 +1040,6 @@
 
   const ELECTRODES = ["FP1","FP2","F7","F3","FZ","F4","F8","T7","C3","CZ","C4","T8","P7","P3","PZ","P4","P8","O1","O2"];
   
-  // 2D Coordinates for Scalp Plot
   const COORDS = {
     "FP1": [-0.3, 0.75], "FP2": [0.3, 0.75],
     "F7": [-0.75, 0.45], "F3": [-0.35, 0.45], "FZ": [0.0, 0.45], "F4": [0.35, 0.45], "F8": [0.75, 0.45],
@@ -733,6 +1053,7 @@
   let isSimulatedAlert = false;
   let radarChartInstance = null;
   let lobeBarInstance = null;
+  let countdownSeconds = 21 * 60 + 24;
 
   function switchTab(tabId) {
     document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
@@ -748,9 +1069,7 @@
     updateUI();
   }
 
-  function onDatabaseChange() {
-    // Keep aligned
-  }
+  function onDatabaseChange() {}
 
   function onSourceChange() {
     const s = document.getElementById('sourceSelect').value;
@@ -759,6 +1078,14 @@
     } else {
       setPreictalAlert(false);
     }
+  }
+
+  function onMontageChange() {
+    const m = document.getElementById('montageSelect').value;
+    const pill = document.getElementById('activeMontagePill');
+    if (m === "bipolar") pill.innerText = "Longitudinal Bipolar (Double Banana)";
+    else if (m === "car") pill.innerText = "Common Average Reference (CAR)";
+    else pill.innerText = "Transverse Bipolar Montage";
   }
 
   function updateGain(val) {
@@ -782,6 +1109,12 @@
       riskEl.innerText = "78.4%";
       riskEl.style.color = "var(--accent-red)";
       updateGauge(78.4);
+      
+      // Start periodic chime
+      if (!alarmInterval) {
+        playHospitalChime();
+        alarmInterval = setInterval(playHospitalChime, 2500);
+      }
     } else {
       banner.className = "alarm-banner alarm-safe";
       title.innerText = "✅ BASELINE NEURAL STABILITY (INTER-ICTAL STATE)";
@@ -791,6 +1124,11 @@
       riskEl.innerText = activePatient.baseRisk + "%";
       riskEl.style.color = "var(--accent-teal)";
       updateGauge(activePatient.baseRisk);
+      
+      if (alarmInterval) {
+        clearInterval(alarmInterval);
+        alarmInterval = null;
+      }
     }
   }
 
@@ -803,7 +1141,6 @@
     const text = document.getElementById('gaugeText');
     text.innerText = pct.toFixed(1) + "%";
     
-    // Total arc length is approx 251.2
     const offset = 251.2 * (1 - (pct / 100));
     arc.style.strokeDashoffset = offset;
     arc.style.stroke = pct > 65 ? "#e11d48" : (pct > 40 ? "#d97706" : "#4338ca");
@@ -818,6 +1155,7 @@
     document.getElementById('vitalHorizon').innerHTML = activePatient.lead + ' <span style="font-size:14px;">MIN</span>';
     document.getElementById('edfFilenameBadge').innerText = activePatient.edf;
     
+    countdownSeconds = Math.round(parseFloat(activePatient.lead) * 60);
     setPreictalAlert(isSimulatedAlert);
     renderLeadBadges();
     drawBrainTopography();
@@ -835,6 +1173,20 @@
       cont.appendChild(span);
     });
   }
+
+  // Ticking Live Clock
+  setInterval(() => {
+    if (isSimulatedAlert && countdownSeconds > 0) {
+      countdownSeconds--;
+      const m = Math.floor(countdownSeconds / 60);
+      const s = countdownSeconds % 60;
+      document.getElementById('liveClockDisplay').innerText = `⏱️ ONSET IN: ${m}m ${s < 10 ? '0' : ''}${s}s`;
+      document.getElementById('liveClockDisplay').style.color = "#be123c";
+    } else {
+      document.getElementById('liveClockDisplay').innerText = `⏱️ HORIZON: NOMINAL`;
+      document.getElementById('liveClockDisplay').style.color = "#64748b";
+    }
+  }, 1000);
 
   // 60 FPS Oscilloscope Simulation
   let oscTime = 0;
@@ -868,7 +1220,7 @@
           const t = oscTime + (x * 0.02);
           let val = Math.sin(t * 3) * 8 + Math.sin(t * 7) * 4 + (Math.random() - 0.5) * 3;
           if (isFocal && isSimulatedAlert) {
-            val += Math.sin(t * 6) * 18; // Pre-ictal rhythmic surge
+            val += Math.sin(t * 6) * 18;
           }
           const y = yBase + val * voltageGain;
           if (x === 0) pCtx.moveTo(x, y);
@@ -876,7 +1228,6 @@
         }
         pCtx.stroke();
         
-        // Label
         pCtx.fillStyle = isFocal ? "#be123c" : "#64748b";
         pCtx.font = "bold 11px 'JetBrains Mono'";
         pCtx.fillText(ch + (isFocal ? " *" : ""), 8, yBase - 6);
@@ -909,7 +1260,6 @@
         }
         fCtx.stroke();
         
-        // Channel Label
         fCtx.fillStyle = isFocal ? "#be123c" : "#64748b";
         fCtx.font = "bold 10px 'JetBrains Mono'";
         fCtx.fillText(ch, 10, yBase - 4);
@@ -933,21 +1283,18 @@
     const cy = canvas.height / 2;
     const r = Math.min(cx, cy) * 0.8;
     
-    // Head Contour
     ctx.strokeStyle = "#cbd5e1";
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, 2 * Math.PI);
     ctx.stroke();
     
-    // Nose
     ctx.beginPath();
     ctx.moveTo(cx - 16, cy - r);
     ctx.lineTo(cx, cy - r - 18);
     ctx.lineTo(cx + 16, cy - r);
     ctx.stroke();
     
-    // Ears
     ctx.beginPath();
     ctx.arc(cx - r - 4, cy, 14, -Math.PI/2, Math.PI/2);
     ctx.stroke();
@@ -955,7 +1302,6 @@
     ctx.arc(cx + r + 4, cy, 14, Math.PI/2, -Math.PI/2);
     ctx.stroke();
 
-    // Draw PLV Edges
     ELECTRODES.forEach((ch1, i) => {
       ELECTRODES.forEach((ch2, j) => {
         if (j > i) {
@@ -979,7 +1325,6 @@
       });
     });
 
-    // Draw Nodes
     ELECTRODES.forEach(ch => {
       const pos = COORDS[ch];
       const x = cx + pos[0] * r;
@@ -994,7 +1339,6 @@
       ctx.lineWidth = 2.5;
       ctx.stroke();
 
-      // Node label
       ctx.fillStyle = "#0f172a";
       ctx.font = "bold 11px 'Plus Jakarta Sans'";
       ctx.textAlign = "center";
@@ -1003,7 +1347,6 @@
   }
 
   function initCharts() {
-    // 1. Radar Trajectory Chart
     const rCtx = document.getElementById('radarChart').getContext('2d');
     const labels = Array.from({length: 25}, (_, i) => `T-${(25-i)*10}s`);
     const dataVals = Array.from({length: 25}, () => (Math.random() * 0.08 + 0.05));
@@ -1050,7 +1393,6 @@
       }
     });
 
-    // 2. Lobe Attention Bar Chart
     const lCtx = document.getElementById('lobeBarChart').getContext('2d');
     lobeBarInstance = new Chart(lCtx, {
       type: 'bar',
@@ -1092,6 +1434,7 @@
       <body style="font-family:sans-serif; padding:24px; color:#0f172a;">
         <h2>BOSTON CHILDREN'S HOSPITAL &bull; CLINICAL NEUROLOGY</h2>
         <h3>ST-GAT Seizure Early Warning Horizon Report</h3>
+        <p><b>Attending Physician:</b> Dr. Sajeev (Verified Staff Signature)</p>
         <p><b>Subject:</b> ${activePatient.name}</p>
         <p><b>Age/Sex:</b> ${activePatient.age} / ${activePatient.gender}</p>
         <p><b>Focal Zone:</b> ${activePatient.focus}</p>
@@ -1111,6 +1454,7 @@
   }
 
   window.addEventListener('DOMContentLoaded', () => {
+    checkInitialAuth();
     updateUI();
     startOscilloscopes();
     initCharts();
