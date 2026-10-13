@@ -1,6 +1,6 @@
 """
-Page 3 - Real-Time Seizure Risk Forecasting & Clinical Alarm Engine (Crisp Light Mode)
-Multi-Database & Multi-Patient Hysteresis Early Warning Horizon Controller
+Page 3 - Real-Time Seizure Risk Forecasting & Clinical Alarm Console (Crisp Light Mode)
+NeuroSync 4D Telemetry Workstation - Dual-Threshold Hysteresis Early Warning Horizon
 """
 
 import streamlit as st
@@ -35,41 +35,46 @@ from src.forecasting_engine import RealTimeForecastingEngine
 from src.data.chb_mit_dataset import CHBMITDataSimulator
 from src.data.database_manager import DatabaseManager, DATABASES, PATIENT_PROFILES
 
-st.set_page_config(page_title="Seizure Forecasting", page_icon="🚨", layout="wide")
+st.set_page_config(page_title="Seizure Forecasting Radar", page_icon="🚨", layout="wide")
 
-# Enforce Pure Crisp Light Mode
 st.markdown("""
 <style>
-    .stApp { background-color: #f8fafc; color: #0f172a; }
-    section[data-testid="stSidebar"] { background-color: #ffffff !important; border-right: 1px solid #e2e8f0; }
-    .header-card {
-        background-color: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 16px 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     }
-    .protocol-card {
+    
+    .stApp {
+        background-color: #f8fafc;
+        background-image: radial-gradient(#e2e8f0 1.2px, transparent 1.2px);
+        background-size: 24px 24px;
+        color: #0f172a;
+    }
+    
+    section[data-testid="stSidebar"] {
+        background-color: #ffffff !important;
+        border-right: 1px solid #e2e8f0 !important;
+    }
+    
+    .forecast-card {
         background-color: #ffffff;
         border: 1px solid #e2e8f0;
-        border-left: 5px solid #dc2626;
-        border-radius: 10px;
-        padding: 18px;
-        margin-top: 15px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
     }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🚨 Real-Time Seizure Risk Forecasting & Clinical Alarm Console")
-st.caption("Dual-Threshold Hysteresis Early Warning Horizon Controller (15 - 30 Minutes Pre-Ictal Window)")
+st.title("🚨 Real-Time Seizure Risk Radar & Hysteresis Controller")
+st.caption("Continuous Pre-Ictal Early Warning Horizon (15 - 30 Minutes Window) with Hysteresis Suppression")
 
-# Sidebar Controls
+# Sidebar
 with st.sidebar:
-    st.subheader("Patient & Alarm Controls")
+    st.subheader("Radar Hyperparameters")
     
-    # Database
     db_key = st.selectbox(
         "Clinical Database",
         options=list(DATABASES.keys()),
@@ -77,13 +82,12 @@ with st.sidebar:
         index=0
     )
     
-    # Patient
     avail_patients = [p for p in PATIENT_PROFILES.keys() if PATIENT_PROFILES[p]["database"] == db_key]
     if not avail_patients:
         avail_patients = list(PATIENT_PROFILES.keys())
         
     patient_id = st.selectbox(
-        "Patient Cohort",
+        "Patient Subject",
         options=avail_patients,
         format_func=lambda p: PATIENT_PROFILES[p]["display_name"],
         index=0
@@ -91,24 +95,23 @@ with st.sidebar:
     patient = PATIENT_PROFILES[patient_id]
     
     stream_source = st.radio(
-        "Telemetry Source",
+        "Telemetry Stream",
         ["Real Hospital EDF File (.edf)", "Dynamic Pre-Ictal Simulation"],
         index=0
     )
     
     state = "preictal"
     if "Simulation" in stream_source:
-        state = st.selectbox("Simulated Phase", ["interictal", "preictal", "ictal"], index=1)
+        state = st.selectbox("Simulation Phase", ["interictal", "preictal", "ictal"], index=1)
         
-    alarm_threshold = st.slider("Alarm Trigger Threshold", 0.40, 0.90, 0.65, 0.05)
-    clear_threshold = st.slider("Alarm Clearance Threshold", 0.20, 0.60, 0.40, 0.05)
+    alarm_threshold = st.slider("Trigger Threshold", 0.40, 0.90, 0.65, 0.05)
+    clear_threshold = st.slider("Reset Threshold", 0.20, 0.60, 0.40, 0.05)
     
-    if st.button("Reset Telemetry History", use_container_width=True):
+    if st.button("Clear Telemetry History", use_container_width=True):
         st.session_state.forecast_history = []
         st.session_state.alarm_log = []
         st.rerun()
 
-# Session State for History & Log
 if "forecast_history" not in st.session_state:
     st.session_state.forecast_history = []
 if "alarm_log" not in st.session_state:
@@ -119,11 +122,7 @@ def get_engine(a_thresh, c_thresh):
     ckpt = PROJECT_ROOT / "models" / "best_model.pt"
     if not ckpt.exists():
         ckpt = PROJECT_ROOT / "checkpoints" / "stgat_best_model.pt"
-    eng = RealTimeForecastingEngine(
-        model_checkpoint_path=str(ckpt),
-        alarm_threshold=a_thresh,
-        clear_threshold=c_thresh
-    )
+    eng = RealTimeForecastingEngine(model_checkpoint_path=str(ckpt), alarm_threshold=a_thresh, clear_threshold=c_thresh)
     sim = CHBMITDataSimulator()
     return eng, sim
 
@@ -132,10 +131,8 @@ engine, simulator = get_engine(alarm_threshold, clear_threshold)
 # Ingest Data
 if "Real" in stream_source:
     raw_eeg, _ = simulator.load_real_patient_recording(patient_id, duration_sec=12)
-    source_tag = f"Real Clinical EDF Stream: {patient['edf_filename']}"
 else:
     raw_eeg, _ = simulator.generate_patient_recording(patient_id, duration_sec=12, state=state)
-    source_tag = f"Simulated {state.upper()} Dynamic State"
 
 engine.ingest_sample_block(raw_eeg)
 res = engine.process_latest_window()
@@ -144,14 +141,12 @@ res = engine.process_latest_window()
 st.session_state.forecast_history.append({
     "time_step": len(st.session_state.forecast_history) + 1,
     "smoothed_risk": res["smoothed_risk"],
-    "raw_risk": res["raw_risk"],
     "alarm_active": res["alarm_active"]
 })
 
 if len(st.session_state.forecast_history) > 40:
     st.session_state.forecast_history = st.session_state.forecast_history[-40:]
 
-# Log alarm if triggered
 if res["alarm_active"]:
     now_str = datetime.datetime.now().strftime("%H:%M:%S")
     if not st.session_state.alarm_log or st.session_state.alarm_log[-1]["status"] != "ACTIVE":
@@ -162,106 +157,73 @@ if res["alarm_active"]:
             "risk_score": f"{res['smoothed_risk']*100:.1f}%",
             "lead_time": f"{lead_val:.1f} min",
             "status": "ACTIVE",
-            "action": "Immediate Pre-Ictal Protocol: Administer Rescue Medication & Safety Hold"
+            "action": f"Administer {patient['medications'][0]} & initiate fall-safety positioning"
         })
 
-# Header Card
-st.markdown(f"""
-<div class="header-card">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-            <h4 style="margin:0; color:#0284c7; font-weight:700;">{patient['display_name']}</h4>
-            <span style="color:#64748b; font-size:0.9rem;">
-                Primary Focus: <b style="color:#dc2626;">{patient['focal_zone']}</b> &bull; Prescribed AED: <b>{', '.join(patient['medications'])}</b>
-            </span>
-        </div>
-        <span style="background-color:#e0f2fe; color:#0369a1; padding:4px 12px; border-radius:6px; font-weight:700; font-size:0.85rem; border:1px solid #bae6fd;">
-            {source_tag}
-        </span>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+# Main Radar Trajectory Chart
+st.markdown('<div class="forecast-card">', unsafe_allow_html=True)
+st.markdown("<h4 style='color:#1e1b4b; margin:0 0 14px 0;'>📈 Continuous Seizure Probability Trajectory & Hysteresis Bounds</h4>", unsafe_allow_html=True)
 
-# Top KPI Metric Cards
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.metric("Continuous Seizure Risk", f"{res['smoothed_risk']*100:.1f}%")
-with col2:
-    lead_display = f"{res['lead_time_min']:.1f} min" if res['lead_time_min'] else f"{patient['metrics']['mean_lead_time_min']:.1f} min"
-    st.metric("Estimated Horizon", lead_display)
-with col3:
-    st.metric("Alarm Hysteresis State", "TRIGGERED" if res["alarm_active"] else "CLEAR")
-with col4:
-    st.metric("Historical Patient Sensitivity", f"{patient['metrics']['sensitivity']:.1f}%")
-
-# Main Seizure Risk Forecasting Chart
 df_hist = pd.DataFrame(st.session_state.forecast_history)
-
 fig = go.Figure()
 
-# Dual Threshold lines
 fig.add_hline(
-    y=alarm_threshold, line_dash="dash", line_color="#dc2626",
+    y=alarm_threshold, line_dash="dash", line_color="#e11d48",
     annotation_text=f"Trigger Threshold ({alarm_threshold:.2f})",
-    annotation_position="top right", annotation_font_color="#dc2626"
+    annotation_position="top right", annotation_font_color="#e11d48"
 )
 fig.add_hline(
-    y=clear_threshold, line_dash="dash", line_color="#15803d",
+    y=clear_threshold, line_dash="dash", line_color="#10b981",
     annotation_text=f"Reset Threshold ({clear_threshold:.2f})",
-    annotation_position="bottom right", annotation_font_color="#15803d"
+    annotation_position="bottom right", annotation_font_color="#10b981"
 )
 
-# Smoothed risk trajectory
 fig.add_trace(go.Scatter(
     x=df_hist["time_step"],
     y=df_hist["smoothed_risk"],
     mode='lines+markers',
-    name="Smoothed Seizure Risk",
-    line=dict(color="#0284c7", width=3),
-    marker=dict(size=6, color="#0369a1")
+    name="Smoothed Risk",
+    line=dict(color="#4338ca", width=3.5),
+    marker=dict(size=7, color="#312e81")
 ))
 
 fig.update_layout(
     template="plotly_white",
-    height=380,
-    margin=dict(l=40, r=40, t=30, b=40),
-    yaxis=dict(title="Seizure Probability", range=[0.0, 1.05], gridcolor="#e2e8f0"),
-    xaxis=dict(title="Temporal Epoch Sequence (10s Windows)", gridcolor="#e2e8f0"),
+    height=360,
+    margin=dict(l=40, r=40, t=20, b=40),
+    yaxis=dict(title="Pre-Ictal Seizure Probability", range=[0.0, 1.05], gridcolor="#f1f5f9"),
+    xaxis=dict(title="Continuous Epoch Sequence (10s Windows)", gridcolor="#f1f5f9"),
     paper_bgcolor="#ffffff",
-    plot_bgcolor="#ffffff",
-    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    plot_bgcolor="#ffffff"
 )
-
 st.plotly_chart(fig, use_container_width=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-# Emergency Clinical Action Protocol
+# Emergency Clinical Protocol
 if res["alarm_active"]:
+    lead_disp = f"{res['lead_time_min']:.1f} Minutes" if res['lead_time_min'] else f"{patient['metrics']['mean_lead_time_min']:.1f} Minutes"
     st.markdown(f"""
-    <div class="protocol-card">
-        <h3 style="color:#b91c1c; margin-top:0; font-size:1.25rem;">
+    <div style="background:#fff1f2; border:1px solid #fecdd3; border-left:6px solid #e11d48; border-radius:12px; padding:20px; margin-bottom:20px;">
+        <h3 style="color:#be123c; margin-top:0; font-size:1.25rem;">
             🚨 PRE-ICTAL EMERGENCY CLINICAL PROTOCOL TRIGGERED
         </h3>
         <p style="color:#334155; margin-bottom:8px;">
-            The model has detected sustained Phase Locking Value (PLV) synchrony across <b>{patient['focal_zone']}</b> exceeding the clinical threshold of <b>{alarm_threshold:.2f}</b>.
-            Estimated clinical seizure onset within <b>{lead_display}</b>.
+            Sustained PLV synchrony across <b>{patient['focal_zone']}</b> crossed <b>{alarm_threshold:.2f}</b>.
+            Estimated clinical onset in <b>{lead_disp}</b>.
         </p>
         <ol style="color:#0f172a; line-height:1.7; margin-bottom:0; font-weight:600;">
-            <li>Position patient into safe recumbent posture (prevent physical falls or head trauma).</li>
-            <li>Prepare prescribed rescue medication: <i>{patient['medications'][0]}</i>.</li>
-            <li>Alert bedside nursing staff and EEG Epilepsy Monitoring Unit (EMU) physician on duty.</li>
-            <li>Ensure video-telemetry recording channels are unobstructed.</li>
+            <li>Assist patient into recumbent side-lying posture (prevent fall injuries).</li>
+            <li>Administer prescribed fast-acting rescue dose: <i>{patient['medications'][0]}</i>.</li>
+            <li>Alert bedside neurology team and ensure clear airway.</li>
         </ol>
     </div>
     """, unsafe_allow_html=True)
 
-# Historical Clinical Alarm Audit Log
-st.divider()
-st.subheader("📋 Clinical Alarm Event Audit Log")
-
+# Audit Log Table
+st.subheader("📋 Hospital Alarm Event Audit Log")
 if st.session_state.alarm_log:
     df_log = pd.DataFrame(st.session_state.alarm_log)
     st.dataframe(df_log, hide_index=True, use_container_width=True)
-    
     csv_data = df_log.to_csv(index=False).encode('utf-8')
     st.download_button(
         "📥 Download Clinical Alarm Audit Report (CSV)",
@@ -270,4 +232,4 @@ if st.session_state.alarm_log:
         mime="text/csv"
     )
 else:
-    st.info("No clinical alarms triggered in the current telemetry window. Patient is in safe baseline state.")
+    st.info("No clinical alarms triggered in the current window. Baseline neural stability confirmed.")
