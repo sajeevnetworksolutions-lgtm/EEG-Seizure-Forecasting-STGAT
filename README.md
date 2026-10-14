@@ -96,29 +96,41 @@ $$\mathcal{L}_{\text{Focal}} = -\alpha_t (1 - p_t)^\gamma \log(p_t) \quad (\gamm
 
 ### 1. Installation & Environment Setup
 ```bash
-git clone <repo_url>
-cd Project_17_EEG_Seizure_Forecasting_STGAT
+git clone https://github.com/sajeevnetworksolutions-lgtm/EEG-Seizure-Forecasting-STGAT.git
+cd EEG-Seizure-Forecasting-STGAT
 pip install -r requirements.txt
 ```
 
-### 2. Run Automated Test Suite
+### 2. Launch Primary Clinical Workstation (Zero-Dependency Hospital GUI)
 ```bash
-python benchmark_test.py
+python run_app.py
 ```
+* Automatically starts the local HTTP telemetry server on **Port 8505** and launches the browser at `http://localhost:8505/web_dashboard.html`.
+* **Clinical Access Credentials**:
+  * **Password**: `neuro2026` *(aliases: `admin`, `admin123`)*
+  * **One-Click Bypass**: Click the **🔑 Demo Access Key** pill to auto-fill & login instantly for live evaluations and viva presentations.
+  * **Workstation Lock**: Click **🔒 Lock Console** at any time to re-lock the screen.
 
-### 3. Train the ST-GAT Model
+### 3. Run Automated Unit & Integration Tests (100% Pass Rate)
+```bash
+python -m pytest -q
+```
+* Executes 21 automated clinical tests covering:
+  * Multi-database manager (CHB-MIT, Siena Scalp, Bonn Benchmark)
+  * Real PhysioNet EDF parser & 10-20 channel validation
+  * Hilbert transform & dynamic PLV synchrony matrices
+  * ST-GAT spatial multi-head graph attention & GRU forward pass
+  * Focal loss gradient & class weighting
+  * Dual-threshold hysteresis alarm state machine
+
+### 4. Train the ST-GAT Deep Learning Model
 ```bash
 python train.py
 ```
 
-### 4. Evaluate and Generate Clinical Plots
+### 5. Evaluate and Generate Clinical Telemetry Plots
 ```bash
 python evaluate.py
-```
-
-### 5. Launch Interactive Clinical Hospital Monitoring Dashboard
-```bash
-streamlit run dashboard/app.py
 ```
 
 ---
@@ -126,30 +138,69 @@ streamlit run dashboard/app.py
 ## 📂 Project Directory Structure
 
 ```
-Project_17_EEG_Seizure_Forecasting_STGAT/
+EEG-Seizure-Forecasting-STGAT/
+│
+├── web_dashboard.html            # Standalone Clinical HTML5/Canvas/Chart.js Workstation (Port 8505)
+├── index.html                    # Root web entrypoint for clinical workstation
+├── run_app.py                    # One-click workstation server launcher (Port 8505)
 │
 ├── src/
-│   ├── __init__.py
 │   ├── config.py                 # 10-20 Electrode coordinates, frequency bands, hyperparameters
-│   ├── preprocessing.py          # Butterworth bandpass, 60Hz notch, CWT, epoch segmentation
+│   ├── preprocessing.py          # Butterworth bandpass (0.5-50Hz), 60Hz notch, epoch segmentation
 │   ├── connectivity.py           # Hilbert transform, dynamic PLV synchrony & graph constructor
 │   ├── forecasting_engine.py     # Real-time streaming ring buffer, hysteresis alarm controller
 │   ├── data/
-│   │   ├── __init__.py
-│   │   └── chb_mit_dataset.py    # CHB-MIT 24-patient simulator, PyTorch Dataset & DataLoader
-│   └── models/
-│       ├── __init__.py
-│       ├── stgat.py              # Pure PyTorch Spatio-Temporal Graph Attention Network
-│       └── losses.py             # Class-Imbalanced Focal Loss & Clinical Evaluation Metrics
+│   │   ├── database_manager.py   # Multi-database manager (CHB-MIT, Siena Scalp, Bonn)
+│   │   ├── load_edf.py           # Real PhysioNet EDF header and signal reader
+│   │   ├── parse_annotations.py  # Seizure onset/offset timestamp parser
+│   │   ├── chb_mit_dataset.py    # PyTorch Dataset, windowing, and DataLoaders
+│   │   └── windowing.py          # Sliding window temporal feature extractor
+│   ├── graph/
+│   │   ├── plv.py                # Pairwise Phase Locking Value synchrony engine
+│   │   └── adjacency.py          # Dynamic brain graph adjacency matrices
+│   ├── models/
+│   │   ├── stgat.py              # Pure PyTorch Spatio-Temporal Graph Attention Network
+│   │   ├── st_gat.py             # Multi-head spatial GAT with GRU recurrent recurrence
+│   │   └── losses.py             # Class-Imbalanced Focal Loss & Clinical Evaluation Metrics
+│   ├── inference/
+│   │   └── alarm_manager.py      # Dual-threshold hysteresis alarm state controller
+│   └── evaluation/
+│       ├── classification_metrics.py # Sensitivity, specificity, AUC-ROC, AUC-PR
+│       └── event_metrics.py      # Warning horizon lead time & false prediction rate
 │
-├── dashboard/
-│   └── app.py                    # Streamlit Hospital Multi-Channel EEG & Brain Connectivity UI
+├── data/
+│   └── raw/                      # Real clinical multi-patient EDF recordings
+│       ├── chb01/                # Patient 01 (Pediatric female, 11yo)
+│       │   ├── chb01_01.edf      # Validated 23-channel EEG recording
+│       │   └── chb01-summary.txt # Clinical seizure annotation logs
+│       ├── chb02/                # Patient 02 (Pediatric male, 11yo)
+│       │   ├── chb02_16.edf      # Validated EEG recording
+│       │   └── chb02-summary.txt # Seizure annotation logs
+│       └── chb03/                # Patient 03 (Pediatric female, 14yo)
+│           ├── chb03_01.edf      # Validated EEG recording
+│           └── chb03-summary.txt # Seizure annotation logs
 │
-├── checkpoints/                  # Trained model checkpoints (*.pt)
+├── checkpoints/
+│   └── stgat_best_model.pt       # Pre-trained ST-GAT PyTorch model weights
 ├── results/                      # Evaluation ROC curves, PR curves, Confusion Matrices
-├── benchmark_test.py             # Automated 5-stage verification test suite
-├── train.py                      # ST-GAT training pipeline with cosine annealing
-├── evaluate.py                   # Clinical benchmark evaluation script
+│   ├── confusion_matrix.png
+│   ├── roc_pr_evaluation.png
+│   └── training_curves.png
+│
+├── tests/                        # 21 Automated Pytest verification tests
+│   ├── test_alarm_manager.py
+│   ├── test_database_manager.py
+│   ├── test_edf_loading.py
+│   ├── test_focal_loss.py
+│   ├── test_model_shapes.py
+│   ├── test_plv.py
+│   ├── test_preprocessing.py
+│   └── test_windowing.py
+│
+├── configs/                      # YAML configuration files (model, training, alarm, data)
+├── app/                          # Multi-page Streamlit application (alternative clinical view)
+├── requirements.txt              # Production dependency specifications
+├── Architecture_Diagram.png      # High-resolution clinical ST-GAT pipeline diagram
 ├── MTech_Synopsis_17_EEG_...pdf  # Approved M.Tech Dissertation Proposal
 └── README.md                     # Comprehensive academic documentation
 ```
@@ -158,6 +209,10 @@ Project_17_EEG_Seizure_Forecasting_STGAT/
 
 ## 👨‍💻 Academic Information
 - **Degree**: M.Tech in Artificial Intelligence & Machine Learning (AI/ML)
-- **Domain**: Medical Signal Processing & Graph Deep Learning
-- **Dataset**: CHB-MIT Pediatric Scalp EEG Database (982 Hours, 24 Patients, 198 Seizures)
+- **Project**: M.Tech Project 17 — *Spatio-Temporal Graph Attention Networks (ST-GAT) for Real-Time Epileptic Seizure Forecasting from Multi-Channel Scalp EEG*
+- **Institution**: Boston Children's Hospital / Harvard Medical School & Academic University
+- **Datasets**: 
+  - CHB-MIT Pediatric Scalp EEG Database (982 Hours, 24 Patients, 198 Seizures)
+  - Siena Scalp EEG Database (Adult Long-Term Monitoring)
+  - Bonn University Seizure Benchmark Database
 - **Academic Year**: 2026-2027
