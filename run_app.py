@@ -1,15 +1,13 @@
 """
 Launcher Script for Standalone HTML5/JS Clinical Neuro-Telemetry Workstation
-Zero Streamlit Dependencies - Full Hospital GUI Console
+Powered by Flask REST API backend + Genuine PyTorch ST-GAT Model Pipeline
 """
 
 import sys
-import subprocess
 import webbrowser
 import time
-from pathlib import Path
-from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
+from pathlib import Path
 
 def launch_dashboard(port=8505):
     project_root = Path(__file__).resolve().parent
@@ -17,21 +15,16 @@ def launch_dashboard(port=8505):
     
     print("=" * 75)
     print("  LAUNCHING NEUROSYNC 4D: CLINICAL ST-GAT TELEMETRY WORKSTATION")
+    print("  Connected to genuine PyTorch ST-GAT Deep Inference Engine & REST API")
     print(f"  URL: {url}")
     print("=" * 75)
     
-    webbrowser.open(url)
+    # Open browser after slight delay to ensure server started
+    threading.Timer(1.5, lambda: webbrowser.open(url)).start()
     
-    # Run HTTP Server in project root
-    import os
-    os.chdir(str(project_root))
-    server_address = ('', port)
-    httpd = HTTPServer(server_address, SimpleHTTPRequestHandler)
-    print(f"Server active on port {port}. Press Ctrl+C to terminate.")
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("\nWorkstation server stopped.")
+    # Import and run server
+    from server import app
+    app.run(host="0.0.0.0", port=port, debug=False, threaded=True)
 
 if __name__ == "__main__":
     launch_dashboard()

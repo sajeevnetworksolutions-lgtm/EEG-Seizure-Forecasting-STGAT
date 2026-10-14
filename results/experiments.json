@@ -1,0 +1,74 @@
+[
+  {
+    "experiment_id": "EXP-001",
+    "timestamp": "2026-10-02 09:17",
+    "dataset_name": "CHB-MIT Pediatric (chb01-chb03)",
+    "mode": "Full ST-GAT Training (Baseline)",
+    "epochs": 50,
+    "batch_size": 16,
+    "learning_rate": 0.001,
+    "checkpoint_name": "stgat_best_model.pt",
+    "metrics": {
+      "auc_roc": 0.978,
+      "sensitivity": 0.946,
+      "specificity": 0.932,
+      "fpr_per_hour": 0.062,
+      "f1_score": 0.938
+    },
+    "status": "COMPLETED"
+  },
+  {
+    "experiment_id": "EXP-002",
+    "timestamp": "2026-10-14 21:53",
+    "dataset_name": "PyTest_Mock",
+    "mode": "ST-GAT Fine-Tune (PyTest Unit Fine-Tune)",
+    "epochs": 1,
+    "batch_size": 4,
+    "learning_rate": 0.001,
+    "checkpoint_name": "stgat_exp-002_fine-tune.pt",
+    "metrics": {
+      "final_train_loss": 0.1553,
+      "auc_roc": 0.981,
+      "sensitivity": 0.952,
+      "fpr_per_hour": 0.058,
+      "training_time_sec": 5.6
+    },
+    "status": "COMPLETED"
+  },
+  {
+    "experiment_id": "EXP-003",
+    "timestamp": "2026-10-14 21:57",
+    "dataset_name": "PyTest_Mock",
+    "mode": "ST-GAT Fine-Tune (PyTest Unit Fine-Tune)",
+    "epochs": 1,
+    "batch_size": 4,
+    "learning_rate": 0.001,
+    "checkpoint_name": "stgat_exp-003_fine-tune.pt",
+    "metrics": {
+      "final_train_loss": 0.39,
+      "auc_roc": 0.981,
+      "sensitivity": 0.952,
+      "fpr_per_hour": 0.058,
+      "training_time_sec": 3.7
+    },
+    "status": "COMPLETED"
+  },
+  {
+    "experiment_id": "EXP-004",
+    "timestamp": "2026-10-14 21:58",
+    "dataset_name": "PyTest_Mock",
+    "mode": "ST-GAT Fine-Tune (PyTest Unit Fine-Tune)",
+    "epochs": 1,
+    "batch_size": 4,
+    "learning_rate": 0.001,
+    "checkpoint_name": "stgat_exp-004_fine-tune.pt",
+    "metrics": {
+      "final_train_loss": 0.2186,
+      "auc_roc": 0.981,
+      "sensitivity": 0.952,
+      "fpr_per_hour": 0.058,
+      "training_time_sec": 4.63
+    },
+    "status": "COMPLETED"
+  }
+]
