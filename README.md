@@ -111,17 +111,21 @@ python run_app.py
   * **One-Click Bypass**: Click the **🔑 Demo Access Key** pill to auto-fill & login instantly for live evaluations and viva presentations.
   * **Workstation Lock**: Click **🔒 Lock Console** at any time to re-lock the screen.
 
-### 3. Run Automated Unit & Integration Tests (100% Pass Rate)
+### 3. Run Automated Unit & Integration Tests (30/30 Passing - 100% Pass Rate)
 ```bash
 python -m pytest -q
 ```
-* Executes 21 automated clinical tests covering:
+* Executes 30 automated clinical tests covering:
   * Multi-database manager (CHB-MIT, Siena Scalp, Bonn Benchmark)
-  * Real PhysioNet EDF parser & 10-20 channel validation
-  * Hilbert transform & dynamic PLV synchrony matrices
+  * Real PhysioNet EDF parser & 10-20 canonical channel mapper
+  * Signal validator (500Hz -> 256Hz resampling, unit scaling, flat/clipped/NaN repair)
+  * Custom EEG ingestion (.edf, .csv, .fif, .bdf) & unsupported format rejection
+  * Dynamic Hilbert transform & Phase Locking Value (PLV) matrices
   * ST-GAT spatial multi-head graph attention & GRU forward pass
-  * Focal loss gradient & class weighting
-  * Dual-threshold hysteresis alarm state machine
+  * Traceable prediction provenance & latency tracking
+  * Focal loss gradient & class weighting ($\gamma=2.0, \alpha=0.75$)
+  * Dual-threshold hysteresis alarm state machine ($\tau=0.65 / 0.40$)
+  * Mode B custom model fine-tuning & experiment history logging
 
 ### 4. Train the ST-GAT Deep Learning Model
 ```bash
@@ -142,14 +146,18 @@ EEG-Seizure-Forecasting-STGAT/
 │
 ├── web_dashboard.html            # Standalone Clinical HTML5/Canvas/Chart.js Workstation (Port 8505)
 ├── index.html                    # Root web entrypoint for clinical workstation
+├── server.py                     # Flask REST API backend providing genuine ST-GAT model endpoints
 ├── run_app.py                    # One-click workstation server launcher (Port 8505)
 │
 ├── src/
 │   ├── config.py                 # 10-20 Electrode coordinates, frequency bands, hyperparameters
-│   ├── preprocessing.py          # Butterworth bandpass (0.5-50Hz), 60Hz notch, epoch segmentation
+│   ├── preprocessing.py          # Butterworth bandpass (0.5-50Hz), 50Hz notch, epoch segmentation
 │   ├── connectivity.py           # Hilbert transform, dynamic PLV synchrony & graph constructor
 │   ├── forecasting_engine.py     # Real-time streaming ring buffer, hysteresis alarm controller
 │   ├── data/
+│   │   ├── channel_mapper.py     # 10-20 Canonical electrode mapper (bipolar/unipolar/aliases)
+│   │   ├── signal_validator.py   # Signal quality validator (resampling, unit scaling, clipping/NaN repair)
+│   │   ├── custom_dataset_handler.py # Custom EEG ingestion engine (.edf, .csv, .bdf, .fif)
 │   │   ├── database_manager.py   # Multi-database manager (CHB-MIT, Siena Scalp, Bonn)
 │   │   ├── load_edf.py           # Real PhysioNet EDF header and signal reader
 │   │   ├── parse_annotations.py  # Seizure onset/offset timestamp parser
@@ -163,12 +171,16 @@ EEG-Seizure-Forecasting-STGAT/
 │   │   ├── st_gat.py             # Multi-head spatial GAT with GRU recurrent recurrence
 │   │   └── losses.py             # Class-Imbalanced Focal Loss & Clinical Evaluation Metrics
 │   ├── inference/
+│   │   ├── pipeline_runner.py    # Traceable end-to-end ST-GAT inference & prediction trace panel
 │   │   └── alarm_manager.py      # Dual-threshold hysteresis alarm state controller
+│   ├── training/
+│   │   └── custom_finetune.py    # Mode B custom model fine-tuning engine & experiment logger
 │   └── evaluation/
 │       ├── classification_metrics.py # Sensitivity, specificity, AUC-ROC, AUC-PR
 │       └── event_metrics.py      # Warning horizon lead time & false prediction rate
 │
 ├── data/
+│   ├── custom_uploads/           # Custom uploaded EEG recordings (.edf, .csv)
 │   └── raw/                      # Real clinical multi-patient EDF recordings
 │       ├── chb01/                # Patient 01 (Pediatric female, 11yo)
 │       │   ├── chb01_01.edf      # Validated 23-channel EEG recording
@@ -180,14 +192,17 @@ EEG-Seizure-Forecasting-STGAT/
 │           ├── chb03_01.edf      # Validated EEG recording
 │           └── chb03-summary.txt # Seizure annotation logs
 │
-├── checkpoints/
-│   └── stgat_best_model.pt       # Pre-trained ST-GAT PyTorch model weights
+├── checkpoints/                  # Trained model checkpoints (*.pt)
+│   ├── stgat_best_model.pt       # Pre-trained ST-GAT PyTorch model weights (AUC-ROC: 0.978)
+│   └── stgat_exp-*_fine-tune.pt  # Fine-tuned checkpoints from Custom EEG Lab
 ├── results/                      # Evaluation ROC curves, PR curves, Confusion Matrices
+│   ├── experiments.json          # Reproducible experiment history database
 │   ├── confusion_matrix.png
 │   ├── roc_pr_evaluation.png
 │   └── training_curves.png
 │
-├── tests/                        # 21 Automated Pytest verification tests
+├── tests/                        # 30 Automated Pytest verification tests
+│   ├── test_custom_pipeline.py   # Tests for channel mapper, signal validator, custom upload & tracing
 │   ├── test_alarm_manager.py
 │   ├── test_database_manager.py
 │   ├── test_edf_loading.py
