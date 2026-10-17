@@ -1,3 +1,4 @@
+# NeuroSync 4D Release v2.4.2 (2026-10-17)
 # Data Configuration for CHB-MIT Scalp EEG Dataset
 dataset:
   name: "CHB-MIT Scalp EEG Database"

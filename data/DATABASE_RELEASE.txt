@@ -1,0 +1,2 @@
+NeuroSync 4D Multi-Cohort Database Release v2.4.2 (2026-10-17)
+Datasets: CHB-MIT Pediatric (chb01, chb02, chb03), Siena Scalp Adult, Bonn Benchmark, Custom Uploads

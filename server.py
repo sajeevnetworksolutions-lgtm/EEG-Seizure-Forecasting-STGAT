@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 NeuroSync 4D Clinical Backend Server
 Flask REST API & Static Workstation Server on Port 8505

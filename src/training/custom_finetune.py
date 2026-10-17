@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Custom Dataset Training and Fine-Tuning Module (Mode B)
 Allows fine-tuning existing ST-GAT checkpoints or training a new model

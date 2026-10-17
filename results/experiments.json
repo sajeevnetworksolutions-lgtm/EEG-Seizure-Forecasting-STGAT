@@ -70,5 +70,23 @@
       "training_time_sec": 4.63
     },
     "status": "COMPLETED"
+  },
+  {
+    "experiment_id": "EXP-005",
+    "timestamp": "2026-10-17 22:24",
+    "dataset_name": "PyTest_Mock",
+    "mode": "ST-GAT Fine-Tune (PyTest Unit Fine-Tune)",
+    "epochs": 1,
+    "batch_size": 4,
+    "learning_rate": 0.001,
+    "checkpoint_name": "stgat_exp-005_fine-tune.pt",
+    "metrics": {
+      "final_train_loss": 0.1584,
+      "auc_roc": 0.981,
+      "sensitivity": 0.952,
+      "fpr_per_hour": 0.058,
+      "training_time_sec": 4.23
+    },
+    "status": "COMPLETED"
   }
 ]

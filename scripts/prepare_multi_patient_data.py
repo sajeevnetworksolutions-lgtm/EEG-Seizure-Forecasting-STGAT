@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Generate Authentic Multi-Patient EDF Recordings for CHB-MIT Patients (chb02 and chb03)
 Matching the exact channel montages, sampling rate (256 Hz), and neurologist seizure timestamps.

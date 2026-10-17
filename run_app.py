@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Launcher Script for Standalone HTML5/JS Clinical Neuro-Telemetry Workstation
 Powered by Flask REST API backend + Genuine PyTorch ST-GAT Model Pipeline

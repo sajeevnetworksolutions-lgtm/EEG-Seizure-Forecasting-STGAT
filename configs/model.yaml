@@ -1,3 +1,4 @@
+# NeuroSync 4D Release v2.4.2 (2026-10-17)
 # Model Architecture Configuration: Spatio-Temporal Graph Attention Network (ST-GAT)
 model:
   name: "STGATSeizureForecaster"

@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Spatio-Temporal Graph Attention Network (ST-GAT) for Real-Time Epileptic Seizure Forecasting
 Pure PyTorch implementation with multi-head dynamic graph attention and temporal GRU propagation.

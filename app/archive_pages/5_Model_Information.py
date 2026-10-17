@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Page 5 - Model Architecture and Mathematical Formulations (Crisp Light Mode)
 NeuroSync 4D Telemetry Workstation - ST-GAT Specifications

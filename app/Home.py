@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 NeuroSync 4D: Clinical Neuro-Telemetry Workstation
 Spatio-Temporal Graph Attention Network (ST-GAT) Seizure Forecasting Platform

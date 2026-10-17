@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Page 1 - Multi-Channel Continuous Scalp EEG Waveform Oscilloscope (Crisp Light Mode)
 NeuroSync 4D Telemetry Workstation - Nihon Kohden / Cadwell Digital Neurofax Style

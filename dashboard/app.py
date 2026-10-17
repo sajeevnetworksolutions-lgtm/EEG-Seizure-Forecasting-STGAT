@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Hospital Clinical Monitoring Dashboard - ST-GAT Epileptic Seizure Forecasting
 Real-Time 19-Channel Scalp EEG Stream, Dynamic Brain Graph Synchrony, and Early Warning Countdown

@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Traceable End-to-End Seizure Forecasting Pipeline Runner
 Executes real PyTorch ST-GAT model inference on arbitrary EEG recordings

@@ -1,3 +1,4 @@
+# NeuroSync 4D Release v2.4.2 (2026-10-17)
 # Training and Optimization Hyperparameters
 training:
   seed: 42

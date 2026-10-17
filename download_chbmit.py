@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Downloader for Real CHB-MIT Scalp EEG Dataset from PhysioNet
 Downloads patient summary annotations and EDF recording files.

@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Page 3 - Real-Time Seizure Risk Forecasting & Clinical Alarm Console (Crisp Light Mode)
 NeuroSync 4D Telemetry Workstation - Dual-Threshold Hysteresis Early Warning Horizon

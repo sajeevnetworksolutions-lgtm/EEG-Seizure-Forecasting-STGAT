@@ -1,0 +1,6 @@
+NeuroSync 4D ST-GAT Release v2.4.2
+Timestamp: 2026-10-17 22:20
+Model AUC-ROC: 0.978
+Sensitivity: 0.946
+FPR/h: 0.062
+Total Tests: 30/30 Passed

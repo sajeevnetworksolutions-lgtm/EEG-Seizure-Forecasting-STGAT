@@ -1,3 +1,4 @@
+# NeuroSync 4D Release v2.4.2 (2026-10-17)
 # Seizure Forecasting Alarm Policy and Evaluation Parameters
 alarm_policy:
   # Dual-threshold hysteresis logic

@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Clinical Database and Multi-Patient Cohort Manager
 Provides unified access to 3 major clinical epilepsy databases:

@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Comprehensive Automated Unit & Integration Tests for:
 1. Channel Mapping (Canonical 10-20 system, Bipolar to Monopolar, Aliases)

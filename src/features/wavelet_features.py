@@ -1,3 +1,4 @@
+# NeuroSync 4D: ST-GAT Clinical Neuro-Telemetry System (Release v2.4.2 - 2026-10-17)
 """
 Continuous Wavelet Transform (CWT) and Multi-Band Power Spectral Features
 """
